@@ -1,5 +1,9 @@
 # Go client for [BitGo.com API v2](https://www.bitgo.com/api/v2/)
 
+[![Documentation](https://godoc.org/github.com/marselester/bitgo-v2?status.svg)](https://godoc.org/github.com/marselester/bitgo-v2)
+[![Go Report Card](https://goreportcard.com/badge/github.com/marselester/bitgo-v2)](https://goreportcard.com/report/github.com/marselester/bitgo-v2)
+[![Travis CI](https://travis-ci.org/marselester/bitgo-v2.png)](https://travis-ci.org/marselester/bitgo-v2)
+
 This is unofficial API client. There are no plans to implement all resources.
 
 ## [Consolidate Wallet Unspents](https://www.bitgo.com/api/v2/#consolidate-wallet-unspents)
