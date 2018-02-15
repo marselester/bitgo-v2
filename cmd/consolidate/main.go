@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	baseURL := flag.String("host", "http://0.0.0.0:3080", "BitGo API server base URL.")
+	baseURL := flag.String("host", "http://0.0.0.0:3080", "BitGo Express API server base URL.")
 	accessToken := flag.String("token", "", "BitGo access token.")
 	coin := flag.String("coin", "btc", "Coin identifier.")
 	walletID := flag.String("wallet", "", "BitGo wallet ID.")
@@ -35,6 +35,7 @@ func main() {
 	minConfirms := flag.Int("min-confirms", 0, "The required number of confirmations for each transaction input.")
 	enforceMinConfirmsForChange := flag.Bool("enforce-min-confirms-for-change", false, "Apply the required confirmations set in min-confirms for change outputs.")
 	maxIter := flag.Int("max-iter", 1, "Maximum number of consolidation iterations to perform.")
+	debug := flag.Bool("debug", false, "Enable debug mode.")
 	flag.Parse()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -49,10 +50,17 @@ func main() {
 		cancel()
 	}()
 
+	var logger bitgo.Logger
+	if *debug {
+		logger = bitgo.LoggerFunc(StdLogger)
+	} else {
+		logger = &bitgo.NoopLogger{}
+	}
 	client := bitgo.NewClient(
 		bitgo.WithBaseURL(*baseURL),
 		bitgo.WithCoin(*coin),
 		bitgo.WithAccesToken(*accessToken),
+		bitgo.WithLogger(logger),
 	)
 
 	params := &bitgo.WalletConsolidateParams{
@@ -74,6 +82,7 @@ func main() {
 		// Print consolidated transaction ID.
 		if err == nil {
 			fmt.Printf("%s\n", tx.TxID)
+			continue
 		}
 
 		// Stop when a context was cancelled (user hit Ctrl+C).
@@ -86,4 +95,10 @@ func main() {
 		}
 		log.Fatalf("consolidate: failed to coalesce unspents: %v", err)
 	}
+}
+
+// StdLogger prints logs to standard error.
+func StdLogger(keyvals ...interface{}) error {
+	log.Printf("%q", keyvals)
+	return nil
 }

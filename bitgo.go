@@ -27,6 +27,7 @@ type Config struct {
 	baseURL     string
 	coin        string
 	accessToken string
+	logger      Logger
 }
 
 // ConfigOption configures how we set up the Client.
@@ -62,6 +63,13 @@ func WithAccesToken(token string) ConfigOption {
 	}
 }
 
+// WithLogger configures a logger to debug API responses.
+func WithLogger(l Logger) ConfigOption {
+	return func(c *Config) {
+		c.logger = l
+	}
+}
+
 // Client manages communication with the BitGo REST-ful API.
 type Client struct {
 	config Config
@@ -69,13 +77,15 @@ type Client struct {
 }
 
 // NewClient returns a Client which can be configured with config options.
-// By default requests are sent to https://www.bitgo.com and currency is "btc".
+// By default requests are sent to https://www.bitgo.com, currency is "btc",
+// and logs are discarded.
 func NewClient(options ...ConfigOption) *Client {
 	c := Client{
 		config: Config{
 			httpClient: http.DefaultClient,
 			baseURL:    defaultBaseURL,
 			coin:       defaultCoin,
+			logger:     &NoopLogger{},
 		},
 	}
 
@@ -99,15 +109,13 @@ func (c *Client) NewRequest(ctx context.Context, method, path string, queryParam
 		urlStr = fmt.Sprintf("%s/api/v2/%s/%s", c.config.baseURL, c.config.coin, path)
 	}
 
-	jsonBody := bytes.Buffer{}
-	if bodyParams != nil {
-		err := json.NewEncoder(&jsonBody).Encode(bodyParams)
-		if err != nil {
-			return nil, err
-		}
+	b, err := json.Marshal(bodyParams)
+	if err != nil {
+		return nil, err
 	}
+	c.config.logger.Log("level", "debug", "msg", "creating request", "method", method, "url", urlStr, "body", b)
 
-	req, err := http.NewRequest(method, urlStr, &jsonBody)
+	req, err := http.NewRequest(method, urlStr, bytes.NewReader(b))
 	if err != nil {
 		return nil, err
 	}
@@ -127,16 +135,20 @@ func (c *Client) NewRequest(ctx context.Context, method, path string, queryParam
 // unmarshals the Response into v.
 // It also handles unmarshaling errors returned by the API.
 func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
+	c.config.logger.Log("level", "debug", "msg", "sending request")
 	resp, err := c.config.httpClient.Do(req)
 	if err != nil {
+		c.config.logger.Log("level", "debug", "msg", "request failed", "err", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		c.config.logger.Log("level", "debug", "msg", "invalid body", "status", resp.StatusCode, "err", err)
 		return resp, err
 	}
+	c.config.logger.Log("level", "debug", "msg", "server response", "status", resp.StatusCode, "body", body)
 
 	if resp.StatusCode == http.StatusOK {
 		err = json.Unmarshal(body, v)
