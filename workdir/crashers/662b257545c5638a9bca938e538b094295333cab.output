@@ -1,0 +1,135 @@
+program hanged (timeout 10 seconds)
+
+SIGABRT: abort
+PC=0x1059c23 m=0 sigcode=0
+
+goroutine 0 [idle]:
+runtime.mach_semaphore_timedwait(0x1d00001903, 0xc43b97eebb, 0x7ffeefbff924, 0xc40000001d, 0x3b97eebbefbff940, 0x14e4ce0, 0x7ffeefbff958, 0x1054473, 0x6fc20d0bb, 0x1033f72, ...)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/runtime/sys_darwin_amd64.s:455 +0x13
+runtime.semasleep1(0x6fc20d0bb, 0x1033f72)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/runtime/os_darwin.go:402 +0xdf
+runtime.semasleep.func1()
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/runtime/os_darwin.go:432 +0x33
+runtime.systemstack(0x14e4d00)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/runtime/asm_amd64.s:344 +0x79
+runtime.mstart()
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/runtime/proc.go:1135
+
+goroutine 7 [syscall]:
+runtime.notetsleepg(0x14e4780, 0x6fc20d0bb, 0x1)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/runtime/lock_sema.go:280 +0x4b fp=0xc42002c760 sp=0xc42002c720 pc=0x10112bb
+runtime.timerproc()
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/runtime/time.go:216 +0x305 fp=0xc42002c7e0 sp=0xc42002c760 pc=0x104a4d5
+runtime.goexit()
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/runtime/asm_amd64.s:2337 +0x1 fp=0xc42002c7e8 sp=0xc42002c7e0 pc=0x1058821
+created by runtime.addtimerLocked
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/runtime/time.go:122 +0xed
+
+goroutine 1 [select]:
+net/http.(*Transport).getConn(0x14e0a20, 0xc4204aa870, 0x0, 0xc420311230, 0x4, 0xc42049e2f0, 0xf, 0x0, 0x0, 0x30)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/http/transport.go:948 +0x5bf
+net/http.(*Transport).RoundTrip(0x14e0a20, 0xc420489f00, 0x14e0a20, 0x0, 0x0)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/http/transport.go:400 +0x6a6
+net/http.send(0xc420489f00, 0x14acfa0, 0x14e0a20, 0x0, 0x0, 0x0, 0xc42013a838, 0xc42004dba0, 0xc42004db30, 0x1)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/http/client.go:249 +0x1a9
+net/http.(*Client).send(0x14e4560, 0xc420489f00, 0x0, 0x0, 0x0, 0xc42013a838, 0x0, 0x1, 0x10120a7)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/http/client.go:173 +0xfd
+net/http.(*Client).Do(0x14e4560, 0xc420489f00, 0x4, 0x4, 0x0)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/http/client.go:602 +0x28d
+github.com/marselester/bitgo-v2.(*Client).Do(0xc420483c70, 0xc420489f00, 0x0, 0x0, 0x0, 0x0, 0x0)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/gopath/src/github.com/marselester/bitgo-v2/bitgo.go:139 +0x14f
+github.com/marselester/bitgo-v2.Fuzz(0x2150000, 0x97, 0x200000, 0x0)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/gopath/src/github.com/marselester/bitgo-v2/fuzz.go:21 +0x1d6
+go-fuzz-dep.Main(0x1351598)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/go-fuzz-dep/main.go:49 +0xad
+main.main()
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/gopath/src/github.com/marselester/bitgo-v2/go.fuzz.main/main.go:10 +0x2d
+
+goroutine 57291 [select]:
+net.(*netFD).connect.func2(0x14b17a0, 0xc4204a4660, 0xc4204ac480, 0xc420495440, 0xc4204953e0)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/fd_unix.go:129 +0xf2
+created by net.(*netFD).connect
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/fd_unix.go:128 +0x2bb
+
+goroutine 57289 [IO wait]:
+internal/poll.runtime_pollWait(0x2354eb0, 0x72, 0xffffffffffffffff)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/runtime/netpoll.go:173 +0x57
+internal/poll.(*pollDesc).wait(0xc4204ac298, 0x72, 0x0, 0x0, 0x0)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/internal/poll/fd_poll_runtime.go:85 +0x113
+internal/poll.(*pollDesc).waitRead(0xc4204ac298, 0xffffffffffffff00, 0x0, 0x0)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/internal/poll/fd_poll_runtime.go:90 +0x55
+internal/poll.(*FD).Accept(0xc4204ac280, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/internal/poll/fd_unix.go:335 +0x34d
+net.(*netFD).accept(0xc4204ac280, 0x1012808, 0x30, 0x1318460)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/fd_unix.go:238 +0x42
+net.(*TCPListener).accept(0xc42013a810, 0x10e0711, 0x1318460, 0xc4204aaa20)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/tcpsock_posix.go:136 +0x2e
+net.(*TCPListener).Accept(0xc42013a810, 0xc420016098, 0x12e6720, 0x14da650, 0x1332960)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/tcpsock.go:247 +0x49
+net/http.(*Server).Serve(0xc420496b60, 0x14b1060, 0xc42013a810, 0x0, 0x0)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/http/server.go:2695 +0x1ca
+net/http/httptest.(*Server).goServe.func1(0xc4201d3810)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/http/httptest/server.go:280 +0x6d
+created by net/http/httptest.(*Server).goServe
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/http/httptest/server.go:278 +0x5c
+
+goroutine 57290 [IO wait]:
+internal/poll.runtime_pollWait(0x2354df0, 0x77, 0xc420020000)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/runtime/netpoll.go:173 +0x57
+internal/poll.(*pollDesc).wait(0xc4204ac498, 0x77, 0xc42004b200, 0x103481b, 0xc42004b290)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/internal/poll/fd_poll_runtime.go:85 +0x113
+internal/poll.(*pollDesc).waitWrite(0xc4204ac498, 0xc42004b200, 0xc42004b2c8, 0x118b77b)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/internal/poll/fd_poll_runtime.go:94 +0x55
+internal/poll.(*FD).WaitWrite(0xc4204ac480, 0x1351648, 0x14b17a0)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/internal/poll/fd_unix.go:403 +0x47
+net.(*netFD).connect(0xc4204ac480, 0x14b17a0, 0xc4204a4660, 0x0, 0x0, 0x14ad6a0, 0xc42046d2c0, 0x0, 0x0, 0x0, ...)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/fd_unix.go:152 +0x2ce
+net.(*netFD).dial(0xc4204ac480, 0x14b17a0, 0xc4204a4660, 0x14b2960, 0x0, 0x14b2960, 0xc4204aa960, 0xc42004b4e8, 0x119f26e)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/sock_posix.go:142 +0xe9
+net.socket(0x14b17a0, 0xc4204a4660, 0x133e486, 0x3, 0x2, 0x1, 0x0, 0x0, 0x14b2960, 0x0, ...)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/sock_posix.go:93 +0x1a5
+net.internetSocket(0x14b17a0, 0xc4204a4660, 0x133e486, 0x3, 0x14b2960, 0x0, 0x14b2960, 0xc4204aa960, 0x1, 0x0, ...)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/ipsock_posix.go:141 +0x129
+net.doDialTCP(0x14b17a0, 0xc4204a4660, 0x133e486, 0x3, 0x0, 0xc4204aa960, 0x1503fa8, 0x0, 0x0)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/tcpsock_posix.go:62 +0xb9
+net.dialTCP(0x14b17a0, 0xc4204a4660, 0x133e486, 0x3, 0x0, 0xc4204aa960, 0xbe9a81d9c4184531, 0xc9ab80b86, 0x14e4860)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/tcpsock_posix.go:58 +0xe4
+net.dialSingle(0x14b17a0, 0xc4204a4660, 0xc4204ac400, 0x14af7a0, 0xc4204aa960, 0x0, 0x0, 0x0, 0x0)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/dial.go:547 +0x3e2
+net.dialSerial(0x14b17a0, 0xc4204a4660, 0xc4204ac400, 0xc42049a850, 0x1, 0x1, 0x0, 0x0, 0x0, 0x0)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/dial.go:515 +0x247
+net.(*Dialer).DialContext(0xc42005c0c0, 0x14b1760, 0xc420016098, 0x133e486, 0x3, 0xc42049e2f0, 0xf, 0x0, 0x0, 0x0, ...)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/dial.go:397 +0x6ee
+net.(*Dialer).DialContext-fm(0x14b1760, 0xc420016098, 0x133e486, 0x3, 0xc42049e2f0, 0xf, 0x1004fa9, 0x60, 0x1214239, 0xc420016098)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/http/transport.go:46 +0x73
+net/http.(*Transport).dial(0x14e0a20, 0x14b1760, 0xc420016098, 0x133e486, 0x3, 0xc42049e2f0, 0xf, 0x102a966, 0x1351df8, 0xc42003ab28, ...)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/http/transport.go:884 +0x223
+net/http.(*Transport).dialConn(0x14e0a20, 0x14b1760, 0xc420016098, 0x0, 0xc420311230, 0x4, 0xc42049e2f0, 0xf, 0xc420028fa0, 0xc420028fa8, ...)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/http/transport.go:1060 +0x1a41
+net/http.(*Transport).getConn.func4(0x14e0a20, 0x14b1760, 0xc420016098, 0xc4204aa8a0, 0xc420495200)
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/http/transport.go:943 +0x78
+created by net/http.(*Transport).getConn
+	/var/folders/yf/9_cj5vb55g5flmk4rw8jkpt80000gn/T/go-fuzz-build052466839/goroot/src/net/http/transport.go:942 +0x393
+
+rax    0xe
+rbx    0x1d
+rcx    0x7ffeefbff8f8
+rdx    0x3b97eebb
+rdi    0x1903
+rsi    0x1d
+rbp    0x7ffeefbff930
+rsp    0x7ffeefbff8f8
+r8     0xc420001980
+r9     0x69
+r10    0x1639ef5e0
+r11    0x206
+r12    0x8de6f3a6b7a1
+r13    0xc420495380
+r14    0x1
+r15    0x0
+rip    0x1059c23
+rflags 0x206
+cs     0x7
+fs     0x0
+gs     0x0
+exit status 2

@@ -68,3 +68,13 @@ func main() {
 	// false
 }
 ```
+
+## Testing
+
+Quick tutorial on [how to fuzz](https://medium.com/@dgryski/go-fuzz-github-com-arolek-ase-3c74d5a3150c) by Damian Gryski.
+Copy JSON files from `testdata` into `workdir/corpus` as sample inputs.
+
+```sh
+$ go-fuzz-build github.com/marselester/bitgo-v2
+$ go-fuzz -bin=bitgo-fuzz.zip -workdir=workdir
+```
