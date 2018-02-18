@@ -8,21 +8,21 @@ This is unofficial API client. There are no plans to implement all resources.
 
 ## [Consolidate Wallet Unspents](https://www.bitgo.com/api/v2/#consolidate-wallet-unspents)
 
-Consolidates Bitcoin Cash of `585951a5df8380e0e3063e9f` wallet using max `0.001` BCH unspents
+This API call will consolidate Bitcoin Cash of `585951a5df8380e0e3063e9f` wallet using max `0.001` BCH unspents
 with 5000 satoshis/kb fee rate. You can stop consolidation by cancelling a `ctx` context.
 
 ```go
 c := bitgo.NewClient(
-    bitgo.WithCoin("bch"),
-    bitgo.WithAccesToken("swordfish"),
+	bitgo.WithCoin("bch"),
+	bitgo.WithAccesToken("swordfish"),
 )
 tx, err := c.Wallet.Consolidate(ctx, "585951a5df8380e0e3063e9f", &bitgo.WalletConsolidateParams{
-    WalletPassphrase: "root",
-    MaxValue:         100000,
-    FeeRate:          5000,
+	WalletPassphrase: "root",
+	MaxValue:         100000,
+	FeeRate:          5000,
 })
 if err != nil {
-    log.Fatalf("Failed to coalesce unspents: %v", err)
+	log.Fatalf("Failed to coalesce unspents: %v", err)
 }
 fmt.Printf("Consolidated transaction ID: %s", tx.TxID)
 ```
@@ -33,6 +33,49 @@ There is a CLI program to consolidate unspensts of a wallet.
 $ go build ./cmd/consolidate/
 $ ./consolidate -token=swordfish -coin=bch -wallet=585951a5df8380e0e3063e9f -passphrase=root -max-value=0.001 -fee-rate=5000
 5885a7e6c7802206f69655ed763d14f101cf46501aef38e275c67c72cfcedb75
+```
+
+## [List Wallet Unspents](https://www.bitgo.com/api/v2/#list-wallet-unspents)
+
+This API call will retrieve the unspent transaction outputs (UTXOs) within a wallet.
+For example, we want to request `58ae81a5df8380e0e307e876` wallet's confirmed unspents and
+print amounts in BTC. You can stop pagination by cancelling a `ctx` context.
+
+```go
+c := bitgo.NewClient(
+	bitgo.WithCoin("bch"),
+	bitgo.WithAccesToken("swordfish"),
+)
+params := url.Values{}
+params.Set("minConfirms", "1")
+err := c.Wallet.Unspents(ctx, "58ae81a5df8380e0e307e876", params, func(list *bitgo.UnspentList) {
+	for _, utxo := range list.Unspents {
+		fmt.Printf("%0.8f\n", bitgo.ToBitcoins(utxo.Value))
+	}
+})
+```
+
+There is a CLI program to list all unspensts of a wallet.
+
+```sh
+$ go build ./cmd/utxo/
+$ ./utxo -token=swordfish -coin=bch -wallet=58ae81a5df8380e0e307e876 -min-confirms=1
+0.00000117
+0.00000001
+0.00000001
+0.00000562
+0.00000001
+0.00000562
+```
+
+You can use it to get a rough idea about unspents available in the wallet.
+
+```sh
+$ ./utxo -token=swordfish -coin=bch -wallet=58ae81a5df8380e0e307e876 > unspents.txt
+$ cat unspents.txt | sort | uniq -c | sort -n -r
+   3 0.00000001
+   2 0.00000562
+   1 0.00000117
 ```
 
 ## Error Handling
