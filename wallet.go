@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 )
 
 // Satoshi is the smallest unit of bitcoin.
@@ -73,4 +74,74 @@ func (s *walletService) Consolidate(ctx context.Context, walletID string, bodyPa
 	tx := TxInfo{}
 	_, err = s.client.Do(req, &tx)
 	return &tx, err
+}
+
+// Unspent is an unspent transaction output (UTXO).
+type Unspent struct {
+	// The outpoint of the unspent (txid:vout). For example, "952ac7fd9c1a5df8380e0e305fac8b42db:0".
+	ID string
+	// The address that owns this unspent.
+	Address string
+	// Value of the unspent in satoshis.
+	Value int64
+	// The height of the block that created this unspent.
+	BlockHeight int64
+	// The date the unspent was created.
+	Date string
+	// The id of the wallet the unspent is in.
+	Wallet string
+	// The id of the wallet the unspent came from (if it was sent from a BitGo wallet you're a member on)
+	FromWallet string
+	// The address type and derivation path of the unspent
+	// (0 = normal unspent, 1 = change unspent, 10 = segwit unspent, 11 = segwit change unspent).
+	Chain int
+	// The position of the address in this chain's derivation path.
+	Index int
+	// The script defining the criteria to be satisfied to spend this unspent.
+	RedeemScript string
+	// A flag indicating whether this is a segwit unspent.
+	IsSegwit bool
+}
+
+// ListMeta is a pagination metadata.
+type ListMeta struct {
+	// Can be used to iterate the next batch of results.
+	NextBatchPrevID string
+	// The digital currency of the unspents.
+	Coin string
+}
+
+// UnspentList is a list of unspents as retrieved from unspents endpoint.
+type UnspentList struct {
+	ListMeta
+	Unspents []Unspent `json:"unspents"`
+}
+
+// Unspents gets a list of unspent transaction outputs (UTXOs) for a wallet.
+// It invokes f for each page of results.
+// You can filter unspents using query parameters as described in the docs
+// https://www.bitgo.com/api/v2/#list-wallet-unspents.
+func (s *walletService) Unspents(ctx context.Context, walletID string, queryParams url.Values, f func(*UnspentList)) error {
+	path := fmt.Sprintf("wallet/%s/unspents", walletID)
+
+	for {
+		req, err := s.client.NewRequest(ctx, http.MethodGet, path, queryParams, nil)
+		if err != nil {
+			return err
+		}
+
+		v := UnspentList{}
+		_, err = s.client.Do(req, &v)
+		if err != nil {
+			return err
+		}
+		f(&v)
+
+		if v.NextBatchPrevID == "" {
+			break
+		}
+		queryParams.Set("prevId", v.NextBatchPrevID)
+	}
+
+	return nil
 }

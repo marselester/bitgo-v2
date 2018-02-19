@@ -109,9 +109,12 @@ func (c *Client) NewRequest(ctx context.Context, method, path string, queryParam
 		urlStr = fmt.Sprintf("%s/api/v2/%s/%s", c.config.baseURL, c.config.coin, path)
 	}
 
-	b, err := json.Marshal(bodyParams)
-	if err != nil {
-		return nil, err
+	var b []byte
+	if bodyParams != nil {
+		var err error
+		if b, err = json.Marshal(bodyParams); err != nil {
+			return nil, err
+		}
 	}
 	c.config.logger.Log("level", "debug", "msg", "creating request", "method", method, "url", urlStr, "body", b)
 
@@ -127,6 +130,7 @@ func (c *Client) NewRequest(ctx context.Context, method, path string, queryParam
 		bearer := fmt.Sprintf("Bearer %s", c.config.accessToken)
 		req.Header.Set("Authorization", bearer)
 	}
+	c.config.logger.Log("level", "debug", "msg", "request headers are set", "header", req.Header)
 
 	return req, nil
 }
@@ -145,10 +149,10 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		c.config.logger.Log("level", "debug", "msg", "invalid body", "status", resp.StatusCode, "err", err)
+		c.config.logger.Log("level", "debug", "msg", "invalid body", "status", resp.Status, "err", err)
 		return resp, err
 	}
-	c.config.logger.Log("level", "debug", "msg", "server response", "status", resp.StatusCode, "body", body)
+	c.config.logger.Log("level", "debug", "msg", "server response", "status", resp.Status, "header", resp.Header, "body", body)
 
 	if resp.StatusCode == http.StatusOK {
 		err = json.Unmarshal(body, v)
