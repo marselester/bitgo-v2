@@ -52,7 +52,7 @@ func main() {
 
 	var logger bitgo.Logger
 	if *debug {
-		logger = bitgo.LoggerFunc(StdLogger)
+		logger = bitgo.LoggerFunc(stdLogger)
 	} else {
 		logger = &bitgo.NoopLogger{}
 	}
@@ -67,8 +67,8 @@ func main() {
 		WalletPassphrase:            *walletPassphrase,
 		NumUnspentsToMake:           *numUnspentsToMake,
 		Limit:                       *limit,
-		MinValue:                    bitgo.ToSatoshis(*minValue),
-		MaxValue:                    bitgo.ToSatoshis(*maxValue),
+		MinValue:                    toSatoshis(*minValue),
+		MaxValue:                    toSatoshis(*maxValue),
 		MinHeight:                   *minHeight,
 		FeeRate:                     *feeRate,
 		FeeTxConfirmTarget:          *feeTxConfirmTarget,
@@ -97,8 +97,16 @@ func main() {
 	}
 }
 
-// StdLogger prints logs to standard error.
-func StdLogger(keyvals ...interface{}) error {
+// stdLogger prints logs to standard error.
+func stdLogger(keyvals ...interface{}) error {
 	log.Printf("%q", keyvals)
 	return nil
+}
+
+// satoshi is the smallest unit of bitcoin.
+const satoshi = 0.00000001
+
+// toSatoshis converts bitcoins to satoshis.
+func toSatoshis(amount float64) int64 {
+	return int64(amount / satoshi)
 }

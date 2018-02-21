@@ -7,19 +7,6 @@ import (
 	"net/url"
 )
 
-// Satoshi is the smallest unit of bitcoin.
-const Satoshi = 0.00000001
-
-// ToBitcoins converts satoshis to bitcoins.
-func ToBitcoins(amount int64) float64 {
-	return float64(amount) * Satoshi
-}
-
-// ToSatoshis converts bitcoins to satoshis.
-func ToSatoshis(amount float64) int64 {
-	return int64(amount / Satoshi)
-}
-
 // walletService communicates with the wallet API endpoints.
 type walletService struct {
 	client *Client

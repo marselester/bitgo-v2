@@ -50,7 +50,7 @@ params := url.Values{}
 params.Set("minConfirms", "1")
 err := c.Wallet.Unspents(ctx, "58ae81a5df8380e0e307e876", params, func(list *bitgo.UnspentList) {
 	for _, utxo := range list.Unspents {
-		fmt.Printf("%0.8f\n", bitgo.ToBitcoins(utxo.Value))
+		fmt.Printf("%0.8f\n", toBitcoins(utxo.Value))
 	}
 })
 ```

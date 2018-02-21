@@ -43,7 +43,7 @@ func main() {
 
 	var logger bitgo.Logger
 	if *debug {
-		logger = bitgo.LoggerFunc(StdLogger)
+		logger = bitgo.LoggerFunc(stdLogger)
 	} else {
 		logger = &bitgo.NoopLogger{}
 	}
@@ -59,10 +59,10 @@ func main() {
 		params.Set("prevId", *prevID)
 	}
 	if *minSize > 0 {
-		params.Set("minValue", fmt.Sprintf("%d", bitgo.ToSatoshis(*minSize)))
+		params.Set("minValue", fmt.Sprintf("%d", toSatoshis(*minSize)))
 	}
 	if *maxSize > 0 {
-		params.Set("maxValue", fmt.Sprintf("%d", bitgo.ToSatoshis(*maxSize)))
+		params.Set("maxValue", fmt.Sprintf("%d", toSatoshis(*maxSize)))
 	}
 	if *minHeight > 0 {
 		params.Set("minHeight", fmt.Sprintf("%d", *minHeight))
@@ -79,7 +79,7 @@ func main() {
 			log.Printf("utxo: fetched %d unspents", downloaded)
 
 			for _, utxo := range list.Unspents {
-				fmt.Printf("%0.8f\n", bitgo.ToBitcoins(utxo.Value))
+				fmt.Printf("%0.8f\n", toBitcoins(utxo.Value))
 			}
 
 			nextBatchPrevID = list.NextBatchPrevID
@@ -105,8 +105,21 @@ func main() {
 	}
 }
 
-// StdLogger prints logs to standard error.
-func StdLogger(keyvals ...interface{}) error {
+// stdLogger prints logs to standard error.
+func stdLogger(keyvals ...interface{}) error {
 	log.Printf("%q", keyvals)
 	return nil
+}
+
+// satoshi is the smallest unit of bitcoin.
+const satoshi = 0.00000001
+
+// toBitcoins converts satoshis to bitcoins.
+func toBitcoins(amount int64) float64 {
+	return float64(amount) * satoshi
+}
+
+// toSatoshis converts bitcoins to satoshis.
+func toSatoshis(amount float64) int64 {
+	return int64(amount / satoshi)
 }
