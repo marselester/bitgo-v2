@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/marselester/bitgo-v2"
 )
@@ -35,6 +36,7 @@ func main() {
 	minConfirms := flag.Int("min-confirms", 0, "The required number of confirmations for each transaction input.")
 	enforceMinConfirmsForChange := flag.Bool("enforce-min-confirms-for-change", false, "Apply the required confirmations set in min-confirms for change outputs.")
 	maxIter := flag.Int("max-iter", 1, "Maximum number of consolidation iterations to perform.")
+	waitIter := flag.Duration("wait-iter", time.Second, "Wait between consolidation iterations.")
 	debug := flag.Bool("debug", false, "Enable debug mode.")
 	flag.Parse()
 
@@ -82,6 +84,7 @@ func main() {
 		// Print consolidated transaction ID.
 		if err == nil {
 			fmt.Printf("%s\n", tx.TxID)
+			time.Sleep(*waitIter)
 			continue
 		}
 
