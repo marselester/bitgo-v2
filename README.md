@@ -81,7 +81,7 @@ You can use it to get a rough idea about unspents available in the wallet.
 
 ```sh
 $ ./utxo -token=swordfish -coin=bch -wallet=58ae81a5df8380e0e307e876 > unspents.txt
-$ cat unspents.txt | sort | uniq -c | sort -n -r
+$ sort unspents.txt | uniq -c | sort -n -r
    3 0.00000001
    2 0.00000562
    1 0.00000117
