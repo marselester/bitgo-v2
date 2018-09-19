@@ -1,4 +1,5 @@
-// Consolidate the unspents currently held in a wallet to a smaller number.
+// Consolidated periodically consolidates the unspents currently held in a wallet to a smaller number,
+// just like consolidate command, but with a schedule.
 package main
 
 import (
@@ -37,6 +38,7 @@ func main() {
 	enforceMinConfirmsForChange := flag.Bool("enforce-min-confirms-for-change", false, "Apply the required confirmations set in min-confirms for change outputs.")
 	maxIter := flag.Int("max-iter", 1, "Maximum number of consolidation iterations to perform.")
 	waitIter := flag.Duration("wait-iter", time.Second, "Wait between consolidation iterations.")
+	schedule := flag.Duration("schedule", time.Hour, "How often to schedule consolidation (one at a time).")
 	debug := flag.Bool("debug", false, "Enable debug mode.")
 	flag.Parse()
 
@@ -48,7 +50,7 @@ func main() {
 		signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 		<-sigchan
 
-		log.Print("consolidate: stopping...")
+		log.Print("consolidated: stopping...")
 		cancel()
 	}()
 
@@ -79,24 +81,33 @@ func main() {
 		EnforceMinConfirmsForChange: *enforceMinConfirmsForChange,
 	}
 
-	for i := 0; i < *maxIter; i++ {
-		tx, err := client.Wallet.Consolidate(ctx, *walletID, params)
-		// Print consolidated transaction ID.
-		if err == nil {
-			fmt.Printf("%s\n", tx.TxID)
-			time.Sleep(*waitIter)
-			continue
-		}
+	for {
+		select {
+		// Schedule periodic consolidation.
+		case <-time.After(*schedule):
+			for i := 0; i < *maxIter; i++ {
+				tx, err := client.Wallet.Consolidate(ctx, *walletID, params)
+				// Print consolidated transaction ID.
+				if err == nil {
+					fmt.Printf("%s\n", tx.TxID)
+					time.Sleep(*waitIter)
+					continue
+				}
 
-		// Stop when a context was cancelled (user hit Ctrl+C).
-		if ctx.Err() != nil {
-			break
-		}
+				// Stop when a context was cancelled (user hit Ctrl+C).
+				if ctx.Err() != nil {
+					break
+				}
 
-		if apiErr, ok := err.(bitgo.Error); ok {
-			log.Fatalf("consolidate: failed to coalesce unspents, %d: %v", apiErr.HTTPStatusCode, apiErr)
+				if apiErr, ok := err.(bitgo.Error); ok {
+					log.Printf("consolidated: failed to coalesce unspents, %d: %v", apiErr.HTTPStatusCode, apiErr)
+				}
+				log.Printf("consolidated: failed to coalesce unspents: %v", err)
+			}
+
+		case <-ctx.Done():
+			return
 		}
-		log.Fatalf("consolidate: failed to coalesce unspents: %v", err)
 	}
 }
 

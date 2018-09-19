@@ -35,6 +35,15 @@ $ ./consolidate -token=swordfish -coin=bch -wallet=585951a5df8380e0e3063e9f -pas
 5885a7e6c7802206f69655ed763d14f101cf46501aef38e275c67c72cfcedb75
 ```
 
+Also you can perform periodic consolidation with `consolidated` just like you would do with `consolidate` program.
+In this example consolidation runs every 12 hours.
+
+```sh
+$ go build ./cmd/consolidated/
+$ ./consolidated -schedule=12h -token=swordfish -coin=bch -wallet=585951a5df8380e0e3063e9f -passphrase=root -max-value=0.001 -fee-rate=5000
+5885a7e6c7802206f69655ed763d14f101cf46501aef38e275c67c72cfcedb75
+```
+
 ## [List Wallet Unspents](https://www.bitgo.com/api/v2/#list-wallet-unspents)
 
 This API call will retrieve the unspent transaction outputs (UTXOs) within a wallet.
@@ -72,7 +81,7 @@ You can use it to get a rough idea about unspents available in the wallet.
 
 ```sh
 $ ./utxo -token=swordfish -coin=bch -wallet=58ae81a5df8380e0e307e876 > unspents.txt
-$ cat unspents.txt | sort | uniq -c | sort -n -r
+$ sort unspents.txt | uniq -c | sort -n -r
    3 0.00000001
    2 0.00000562
    1 0.00000117

@@ -31,7 +31,7 @@ func main() {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	// Listen to Ctrl+C and kill/killall to gracefully stop listing unspents.
+	// Listen to INT/TERM to gracefully stop listing unspents.
 	go func() {
 		sigchan := make(chan os.Signal, 1)
 		signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
